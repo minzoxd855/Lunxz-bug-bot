@@ -1,0 +1,255 @@
+const { cmd } = require("../command");
+const fs = require("fs-extra");
+const path = require("path");
+
+const BOT_NAME = "ʟᴜɴᴀxᴢ ᴍᴅ";
+const CHAT_DIR = path.join(process.cwd(), "chatlogs");
+
+fs.ensureDirSync(CHAT_DIR);
+
+function getText(message) {
+    if (!message) return "";
+
+    if (message.conversation) {
+        return message.conversation;
+    }
+
+    if (message.extendedTextMessage?.text) {
+        return message.extendedTextMessage.text;
+    }
+
+    if (message.imageMessage?.caption) {
+        return message.imageMessage.caption;
+    }
+
+    if (message.videoMessage?.caption) {
+        return message.videoMessage.caption;
+    }
+
+    if (message.documentMessage?.caption) {
+        return message.documentMessage.caption;
+    }
+
+    if (message.buttonsResponseMessage?.selectedDisplayText) {
+        return message.buttonsResponseMessage.selectedDisplayText;
+    }
+
+    if (message.listResponseMessage?.title) {
+        return message.listResponseMessage.title;
+    }
+
+    return "";
+}
+
+async function saveChatMessage(m) {
+    try {
+        if (!m?.key?.remoteJid) return;
+
+        const jid = m.key.remoteJid;
+
+        // Only groups
+        if (!jid.endsWith("@g.us")) return;
+
+        // Ignore bot's own messages
+        if (m.key.fromMe) return;
+
+        const text = getText(m.message);
+        if (!text) return;
+
+        const sender =
+            m.pushName ||
+            m.key.participant ||
+            "Unknown";
+
+        const time = new Date().toLocaleString("en-GB", {
+            timeZone: "Asia/Colombo"
+        });
+
+        const data = {
+            time,
+            sender,
+            text: String(text).replace(/\r?\n/g, " ")
+        };
+
+        const file = path.join(
+            CHAT_DIR,
+            `${jid.replace(/[^a-zA-Z0-9]/g, "_")}.jsonl`
+        );
+
+        await fs.appendFile(
+            file,
+            JSON.stringify(data) + "\n",
+            "utf8"
+        );
+
+    } catch (error) {
+        console.log("Chat Save Error:", error.message);
+    }
+}
+
+
+// ===============================
+// CHAT FILE COMMAND
+// ===============================
+
+cmd({
+    pattern: "chatfile",
+    alias: ["chatlog", "chatbackup", "exportchat"],
+    react: "📁",
+    desc: "Export saved group chat as a file.",
+    category: "group",
+    filename: __filename
+},
+
+async (conn, mek, m, {
+    from,
+    pushname,
+    isOwner,
+    isGroup,
+    reply
+}) => {
+
+    try {
+
+        if (!isGroup) {
+            return await reply(
+                `╭━━〔 ${BOT_NAME} 〕━━╮\n` +
+                `│\n` +
+                `│ ❌ This command works\n` +
+                `│    only inside groups.\n` +
+                `│\n` +
+                `╰━━━━━━━━━━━━━━╯`
+            );
+        }
+
+        if (!isOwner) {
+            return await reply(
+                `╭━━〔 ${BOT_NAME} 〕━━╮\n` +
+                `│\n` +
+                `│ ❌ Owner Only Command\n` +
+                `│\n` +
+                `╰━━━━━━━━━━━━━━╯`
+            );
+        }
+
+        const file = path.join(
+            CHAT_DIR,
+            `${from.replace(/[^a-zA-Z0-9]/g, "_")}.jsonl`
+        );
+
+        if (!(await fs.pathExists(file))) {
+            return await reply(
+                `╭━━〔 ${BOT_NAME} 〕━━╮\n` +
+                `│\n` +
+                `│ ⚠️ No chat data found.\n` +
+                `│\n` +
+                `│ Send messages after\n` +
+                `│ installing this plugin,\n` +
+                `│ then try again.\n` +
+                `│\n` +
+                `╰━━━━━━━━━━━━━━╯`
+            );
+        }
+
+        await reply(
+            `╭━━〔 ${BOT_NAME} 〕━━╮\n` +
+            `│\n` +
+            `│ ⏳ Creating chat file...\n` +
+            `│\n` +
+            `╰━━━━━━━━━━━━━━╯`
+        );
+
+        const raw = await fs.readFile(file, "utf8");
+
+        const lines = raw
+            .split("\n")
+            .filter(Boolean);
+
+        if (!lines.length) {
+            return await reply("❌ Chat file is empty.");
+        }
+
+        let output = "";
+
+        output += "══════════════════════════════════\n";
+        output += `        ${BOT_NAME}\n`;
+        output += "        GROUP CHAT BACKUP\n";
+        output += "══════════════════════════════════\n\n";
+
+        output += `Generated : ${new Date().toLocaleString("en-GB", {
+            timeZone: "Asia/Colombo"
+        })}\n`;
+
+        output += `Messages  : ${lines.length}\n`;
+        output += `Group JID : ${from}\n\n`;
+
+        output += "──────────────────────────────────\n\n";
+
+        let count = 0;
+
+        for (const line of lines) {
+
+            try {
+
+                const item = JSON.parse(line);
+
+                count++;
+
+                output += `[${item.time}] ${item.sender}\n`;
+                output += `${item.text}\n\n`;
+
+            } catch {
+                // Ignore broken lines
+            }
+        }
+
+        output += "──────────────────────────────────\n";
+        output += `Total Messages: ${count}\n`;
+        output += `Generated by ${BOT_NAME}\n`;
+        output += "──────────────────────────────────\n";
+
+        const outputFile = path.join(
+            CHAT_DIR,
+            `LUNAXZ_CHAT_${Date.now()}.txt`
+        );
+
+        await fs.writeFile(
+            outputFile,
+            output,
+            "utf8"
+        );
+
+        await conn.sendMessage(
+            from,
+            {
+                document: await fs.readFile(outputFile),
+                mimetype: "text/plain",
+                fileName: "LUNAXZ_GROUP_CHAT.txt",
+                caption:
+                    `📁 *${BOT_NAME}*\n\n` +
+                    `✅ Group chat file created.\n` +
+                    `💬 Messages: ${count}`
+            },
+            {
+                quoted: mek
+            }
+        );
+
+        // Remove temporary export file
+        await fs.remove(outputFile);
+
+    } catch (error) {
+
+        console.log("Chat File Error:", error);
+
+        await reply(
+            `❌ Chat File Error\n\n${error.message}`
+        );
+    }
+});
+
+
+// Export logger for pair.js if needed
+module.exports = {
+    saveChatMessage
+};
