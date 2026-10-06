@@ -1,0 +1,354 @@
+const { cmd } = require('../command');
+const fs = require('fs');
+const path = require('path');
+
+const BOT_NAME = 'ʟᴜɴᴀxᴢ ᴍᴅ';
+const CHAT_DIR = path.join(process.cwd(), 'chatlogs');
+
+// Create chatlogs folder
+if (!fs.existsSync(CHAT_DIR)) {
+    fs.mkdirSync(CHAT_DIR, { recursive: true });
+}
+
+
+// ======================================================
+// SAVE GROUP MESSAGE
+// ======================================================
+
+function saveChatMessage(m) {
+    try {
+        const jid = m?.key?.remoteJid;
+
+        // Group only
+        if (!jid || !jid.endsWith('@g.us')) return;
+
+        // Ignore bot's own messages
+        if (m?.key?.fromMe) return;
+
+        const msg = m?.message;
+
+        if (!msg) return;
+
+        const text =
+            msg.conversation ||
+            msg.extendedTextMessage?.text ||
+            msg.imageMessage?.caption ||
+            msg.videoMessage?.caption ||
+            msg.documentMessage?.caption ||
+            msg.buttonsResponseMessage?.selectedDisplayText ||
+            msg.listResponseMessage?.title ||
+            '';
+
+        if (!text) return;
+
+        const sender =
+            m?.key?.participant ||
+            'Unknown';
+
+        const timestamp = m?.messageTimestamp
+            ? Number(m.messageTimestamp) * 1000
+            : Date.now();
+
+        const date = new Date(timestamp);
+
+        const time = date.toLocaleString('en-GB', {
+            timeZone: 'Asia/Colombo',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+
+        const file = path.join(
+            CHAT_DIR,
+            `${jid.replace(/[^0-9]/g, '')}.jsonl`
+        );
+
+        const data = {
+            sender,
+            text,
+            time
+        };
+
+        fs.appendFileSync(
+            file,
+            JSON.stringify(data) + '\n'
+        );
+
+    } catch (error) {
+        console.error(
+            '[CHAT LOGGER ERROR]',
+            error.message
+        );
+    }
+}
+
+
+// ======================================================
+// CHAT FILE COMMAND
+// ======================================================
+
+cmd({
+    pattern: "chatfile",
+    alias: [
+        "chatlog",
+        "chatbackup",
+        "exportchat"
+    ],
+    react: "📁",
+    desc: "Export saved group chat as a file.",
+    category: "group",
+    filename: __filename
+},
+
+async (
+    conn,
+    mek,
+    m,
+    {
+        from,
+        pushname,
+        isOwner,
+        isGroup,
+        reply
+    }
+) => {
+
+    try {
+
+        // ------------------------------------------
+        // GROUP CHECK
+        // ------------------------------------------
+
+        if (!isGroup) {
+            return await reply(
+`╭━━━〔 *${BOT_NAME}* 〕━━━╮
+┃
+┃ ❌ *GROUP ONLY*
+┃
+┃ මේ command එක group
+┃ එකක් ඇතුළේ use කරන්න.
+┃
+╰━━━━━━━━━━━━━━━━━━╯`
+            );
+        }
+
+
+        // ------------------------------------------
+        // OWNER CHECK
+        // ------------------------------------------
+
+        if (!isOwner) {
+            return await reply(
+`╭━━━〔 *${BOT_NAME}* 〕━━━╮
+┃
+┃ ❌ *ACCESS DENIED*
+┃
+┃ මේ command එක owner
+┃ ට විතරයි.
+┃
+╰━━━━━━━━━━━━━━━━━━╯`
+            );
+        }
+
+
+        // ------------------------------------------
+        // PROCESSING
+        // ------------------------------------------
+
+        await reply(
+`╭━━━〔 *${BOT_NAME}* 〕━━━╮
+┃
+┃ ⏳ *CREATING CHAT FILE*
+┃
+┃ 📁 Collecting messages...
+┃ 🔄 Preparing file...
+┃
+╰━━━━━━━━━━━━━━━━━━╯`
+        );
+
+
+        const file = path.join(
+            CHAT_DIR,
+            `${from.replace(/[^0-9]/g, '')}.jsonl`
+        );
+
+
+        // ------------------------------------------
+        // CHECK DATA
+        // ------------------------------------------
+
+        if (!fs.existsSync(file)) {
+
+            return await reply(
+`╭━━━〔 *${BOT_NAME}* 〕━━━╮
+┃
+┃ ❌ *NO CHAT DATA*
+┃
+┃ Bot එක online වෙලා
+┃ messages collect කරලා නැහැ.
+┃
+╰━━━━━━━━━━━━━━━━━━╯`
+            );
+        }
+
+
+        const raw = fs.readFileSync(
+            file,
+            'utf8'
+        );
+
+        const lines = raw
+            .split('\n')
+            .filter(Boolean);
+
+
+        if (!lines.length) {
+            return await reply(
+                `❌ *No messages found.*`
+            );
+        }
+
+
+        // ------------------------------------------
+        // CREATE CHAT TEXT
+        // ------------------------------------------
+
+        let chatText = '';
+
+        chatText +=
+`╔════════════════════════════════╗
+        ${BOT_NAME}
+          CHAT FILE
+╚════════════════════════════════╝
+
+📁 GROUP CHAT EXPORT
+📊 TOTAL MESSAGES : ${lines.length}
+📅 EXPORTED       : ${new Date().toLocaleString(
+    'en-GB',
+    {
+        timeZone: 'Asia/Colombo'
+    }
+)}
+
+══════════════════════════════════
+
+`;
+
+
+        let count = 0;
+
+        for (const line of lines) {
+
+            try {
+
+                const data = JSON.parse(line);
+
+                count++;
+
+                chatText +=
+`[${count}]
+👤 ${data.sender}
+🕒 ${data.time}
+💬 ${data.text}
+
+──────────────────────────────────
+
+`;
+
+            } catch {
+                // Ignore invalid lines
+            }
+        }
+
+
+        chatText +=
+`══════════════════════════════════
+          ${BOT_NAME}
+        CHAT EXPORT END
+══════════════════════════════════`;
+
+
+        // ------------------------------------------
+        // CREATE TXT
+        // ------------------------------------------
+
+        const outputFile = path.join(
+            CHAT_DIR,
+            `LUNAXZ_MD_CHAT_${Date.now()}.txt`
+        );
+
+        fs.writeFileSync(
+            outputFile,
+            chatText,
+            'utf8'
+        );
+
+
+        // ------------------------------------------
+        // SEND FILE
+        // ------------------------------------------
+
+        await conn.sendMessage(
+            from,
+            {
+                document: fs.readFileSync(outputFile),
+                mimetype: 'text/plain',
+                fileName: 'LUNAXZ-MD-CHAT.txt',
+                caption:
+`╭━━━〔 *${BOT_NAME}* 〕━━━╮
+┃
+┃ 📁 *CHAT FILE READY*
+┃
+┃ 💬 Messages : *${count}*
+┃ 📄 Format   : *TXT*
+┃
+┃ ✅ Successfully exported.
+┃
+╰━━━━━━━━━━━━━━━━━━╯`
+            },
+            {
+                quoted: mek
+            }
+        );
+
+
+        // ------------------------------------------
+        // DELETE TEMP FILE
+        // ------------------------------------------
+
+        try {
+            fs.unlinkSync(outputFile);
+        } catch {}
+
+
+    } catch (error) {
+
+        console.error(
+            '[CHATFILE ERROR]',
+            error
+        );
+
+        await reply(
+`╭━━━〔 *${BOT_NAME}* 〕━━━╮
+┃
+┃ ❌ *ERROR*
+┃
+┃ ${error.message || error}
+┃
+╰━━━━━━━━━━━━━━━━━━╯`
+        );
+    }
+});
+
+
+// ======================================================
+// EXPORT
+// ======================================================
+
+module.exports = {
+    saveChatMessage
+};
