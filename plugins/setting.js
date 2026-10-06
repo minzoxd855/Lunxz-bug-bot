@@ -1,9 +1,10 @@
 const { cmd } = require('../command');
-const config = require('../config');
+const fs = require('fs');
+const config = require('../config'); 
 
 cmd({
     pattern: "settings",
-    alias: ["setting", "st", "dtec", "panel"],
+    alias: ["setting", "st", "dtec", "panel"], 
     react: "📍",
     desc: "Open bot settings panel.",
     category: "owner",
@@ -12,75 +13,22 @@ cmd({
 async (conn, mek, m, { from, pushname, prefix, isOwner, reply }) => {
     try {
         if (!isOwner) {
-            return await reply(`*_• ඔයාට \`Lunxz Md\` වැඩ කරන්නෙ නැ_`);
+            return await reply(`*_• ඔයාට \`Lunxz Md\` වැඩ කරන්නෙ නැ`);
         }
-
-        const alwaysOffline =
-            String(config.ALWAYS_OFFLINE) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const alwaysOnline =
-            String(config.ALWAYS_ONLINE) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const autoViewStatus =
-            String(config.AUTO_READ_STATUS) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const autoLikeStatus =
-            String(config.AUTO_LIKE_STATUS) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const autoRecording =
-            String(config.AUTO_RECORDING) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const autoTyping =
-            String(config.AUTO_TYPING) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const autoReact =
-            String(config.AUTO_REACT) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const antiBot =
-            String(config.ANTI_BOT) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const antiBad =
-            String(config.ANTI_BAD) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const antiLink =
-            String(config.ANTI_LINK) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const readCmdOnly =
-            String(config.READ_CMD_ONLY) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const autoRead =
-            String(config.AUTO_READ) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const autoBio =
-            String(config.AUTO_BIO) === 'true'
-                ? '✅ 𝙾𝙽'
-                : '❌ 𝙾𝙵𝙵';
-
-        const workType = config.WORK_TYPE || 'public';
+        let alwaysOffline = String(config.ALWAYS_OFFLINE) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let alwaysOnline = String(config.ALWAYS_ONLINE) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let autoViewStatus = String(config.AUTO_READ_STATUS) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let autoLikeStatus = String(config.AUTO_LIKE_STATUS) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let autoRecording = String(config.AUTO_RECORDING) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let autoTyping = String(config.AUTO_TYPING) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let autoReact = String(config.AUTO_REACT) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let antiBot = String(config.ANTI_BOT) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let antiBad = String(config.ANTI_BAD) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let antiLink = String(config.ANTI_LINK) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let readCmdOnly = String(config.READ_CMD_ONLY) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let autoRead = String(config.AUTO_READ) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let autoBio = String(config.AUTO_BIO) === 'true' ? '✅ 𝙾𝙽' : '❌ 𝙾𝙵𝙵';
+        let workType = config.WORK_TYPE || 'public';
 
         const settingsText = `
 *╭────────────────┈⊷*
@@ -114,25 +62,15 @@ async (conn, mek, m, { from, pushname, prefix, isOwner, reply }) => {
 ┃ 1️⃣1️⃣ | ʀᴇᴀᴅ ᴄᴍᴅ ᴏɴʟʏ ᴏɴ/ᴏғғ
 ┃ 1️⃣2️⃣ | ᴀᴜᴛᴏ ʀᴇᴀᴅ ᴏɴ/ᴏғғ
 ┃ 1️⃣3️⃣ | ᴀᴜᴛᴏ ʙɪᴏ ᴏɴ/ᴏғғ
-┃ 1️⃣4️⃣ | ᴄʜᴀɴɢᴇ ᴡᴏʀᴋ ᴛʏᴘᴇ
+┃ 1️⃣4️⃣ | ᴄʜᴀɴɢᴇ ᴡᴏʀᴋ ᴛʏᴘᴇ (ᴘᴜʙ/ᴘʀɪ/ɢʀᴘ/ɪɴʙ)
 ╰━━━━━━━━━━━━━━━━━━━━┈⊷
 `;
 
-        // Send menu as TEXT first.
-        // This avoids remote-image failures preventing the menu.
-        const sentMsg = await conn.sendMessage(
-            from,
-            {
-                text: settingsText
-            },
-            {
-                quoted: mek
-            }
-        );
-
-        // Number mapping
+        const sentMsg = await conn.sendMessage(from, {
+            image: { url: "https://ibb.co/Cpnpjvw6" },
+            caption: settingsText
+        }, { quoted: mek });
         global.numberStore = global.numberStore || {};
-
         global.numberStore[sentMsg.key.id] = {
             "1": "toggle_alwaysoffline",
             "2": "toggle_alwaysonline",
@@ -150,405 +88,120 @@ async (conn, mek, m, { from, pushname, prefix, isOwner, reply }) => {
             "14": "toggle_worktype"
         };
 
-        console.log(`[SETTINGS] Menu sent: ${sentMsg.key.id}`);
-
     } catch (e) {
-        console.error("[SETTINGS ERROR]", e);
-
-        try {
-            await reply(
-                `❌ *Settings Error!*\n\n` +
-                `\`\`\`${e.message || e}\`\`\``
-            );
-        } catch (err) {
-            console.error("[SETTINGS REPLY ERROR]", err);
-        }
+        console.log(e);
+        reply(`*❌ Error occurred!*\n\n${e}`);
     }
 });
 
-
-/* =========================================================
-   CONFIG UPDATE FUNCTION
-========================================================= */
-
-const updateConfig = async (key, val, reply) => {
+const updateConfig = (key, val, reply) => {
     config[key] = val;
-
-    await reply(
-        `✅ *${key}* has been set to *${String(val).toUpperCase()}*`
-    );
+    reply(`✅ *${key}* has been set to *${val.toString().toUpperCase()}*`);
 };
 
-
-/* =========================================================
-   ALWAYS OFFLINE
-========================================================= */
-
-cmd({
-    pattern: "toggle_alwaysoffline",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_alwaysoffline", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.ALWAYS_OFFLINE) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'ALWAYS_OFFLINE',
-        newVal,
-        reply
-    );
+    const newVal = String(config.ALWAYS_OFFLINE) === 'true' ? 'false' : 'true';
+    updateConfig('ALWAYS_OFFLINE', newVal, reply);
 });
 
-
-/* =========================================================
-   ALWAYS ONLINE
-========================================================= */
-
-cmd({
-    pattern: "toggle_alwaysonline",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_alwaysonline", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.ALWAYS_ONLINE) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'ALWAYS_ONLINE',
-        newVal,
-        reply
-    );
+    const newVal = String(config.ALWAYS_ONLINE) === 'true' ? 'false' : 'true';
+    updateConfig('ALWAYS_ONLINE', newVal, reply);
 });
 
-
-/* =========================================================
-   AUTO VIEW STATUS
-========================================================= */
-
-cmd({
-    pattern: "toggle_autoviewstatus",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_autoviewstatus", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.AUTO_READ_STATUS) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'AUTO_READ_STATUS',
-        newVal,
-        reply
-    );
+    const newVal = String(config.AUTO_READ_STATUS) === 'true' ? 'false' : 'true';
+    updateConfig('AUTO_READ_STATUS', newVal, reply);
 });
 
-
-/* =========================================================
-   AUTO LIKE STATUS
-========================================================= */
-
-cmd({
-    pattern: "toggle_autolikestatus",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_autolikestatus", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.AUTO_LIKE_STATUS) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'AUTO_LIKE_STATUS',
-        newVal,
-        reply
-    );
+    const newVal = String(config.AUTO_LIKE_STATUS) === 'true' ? 'false' : 'true';
+    updateConfig('AUTO_LIKE_STATUS', newVal, reply);
 });
 
-
-/* =========================================================
-   AUTO RECORDING
-========================================================= */
-
-cmd({
-    pattern: "toggle_autorecording",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_autorecording", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.AUTO_RECORDING) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'AUTO_RECORDING',
-        newVal,
-        reply
-    );
+    const newVal = String(config.AUTO_RECORDING) === 'true' ? 'false' : 'true';
+    updateConfig('AUTO_RECORDING', newVal, reply);
 });
 
-
-/* =========================================================
-   AUTO TYPING
-========================================================= */
-
-cmd({
-    pattern: "toggle_autotyping",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_autotyping", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.AUTO_TYPING) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'AUTO_TYPING',
-        newVal,
-        reply
-    );
+    const newVal = String(config.AUTO_TYPING) === 'true' ? 'false' : 'true';
+    updateConfig('AUTO_TYPING', newVal, reply);
 });
 
-
-/* =========================================================
-   AUTO REACT
-========================================================= */
-
-cmd({
-    pattern: "toggle_autoreact",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_autoreact", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.AUTO_REACT) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'AUTO_REACT',
-        newVal,
-        reply
-    );
+    const newVal = String(config.AUTO_REACT) === 'true' ? 'false' : 'true';
+    updateConfig('AUTO_REACT', newVal, reply);
 });
 
-
-/* =========================================================
-   ANTI BOT
-========================================================= */
-
-cmd({
-    pattern: "toggle_antibot",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_antibot", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.ANTI_BOT) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'ANTI_BOT',
-        newVal,
-        reply
-    );
+    const newVal = String(config.ANTI_BOT) === 'true' ? 'false' : 'true';
+    updateConfig('ANTI_BOT', newVal, reply);
 });
 
-
-/* =========================================================
-   ANTI BAD
-========================================================= */
-
-cmd({
-    pattern: "toggle_antibad",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_antibad", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.ANTI_BAD) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'ANTI_BAD',
-        newVal,
-        reply
-    );
+    const newVal = String(config.ANTI_BAD) === 'true' ? 'false' : 'true';
+    updateConfig('ANTI_BAD', newVal, reply);
 });
 
-
-/* =========================================================
-   ANTI LINK
-========================================================= */
-
-cmd({
-    pattern: "toggle_antilink",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_antilink", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.ANTI_LINK) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'ANTI_LINK',
-        newVal,
-        reply
-    );
+    const newVal = String(config.ANTI_LINK) === 'true' ? 'false' : 'true';
+    updateConfig('ANTI_LINK', newVal, reply);
 });
 
-
-/* =========================================================
-   READ COMMAND ONLY
-========================================================= */
-
-cmd({
-    pattern: "toggle_readcmdonly",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_readcmdonly", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.READ_CMD_ONLY) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'READ_CMD_ONLY',
-        newVal,
-        reply
-    );
+    const newVal = String(config.READ_CMD_ONLY) === 'true' ? 'false' : 'true';
+    updateConfig('READ_CMD_ONLY', newVal, reply);
 });
 
-
-/* =========================================================
-   AUTO READ
-========================================================= */
-
-cmd({
-    pattern: "toggle_autoread",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_autoread", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.AUTO_READ) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'AUTO_READ',
-        newVal,
-        reply
-    );
+    const newVal = String(config.AUTO_READ) === 'true' ? 'false' : 'true';
+    updateConfig('AUTO_READ', newVal, reply);
 });
 
-
-/* =========================================================
-   AUTO BIO
-========================================================= */
-
-cmd({
-    pattern: "toggle_autobio",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_autobio", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
-
-    const newVal =
-        String(config.AUTO_BIO) === 'true'
-            ? 'false'
-            : 'true';
-
-    await updateConfig(
-        'AUTO_BIO',
-        newVal,
-        reply
-    );
+    const newVal = String(config.AUTO_BIO) === 'true' ? 'false' : 'true';
+    updateConfig('AUTO_BIO', newVal, reply);
 });
 
-
-/* =========================================================
-   WORK TYPE
-========================================================= */
-
-cmd({
-    pattern: "toggle_worktype",
-    dontAddCommandList: true,
-    filename: __filename
-},
+cmd({ pattern: "toggle_worktype", dontAddCommandList: true, filename: __filename },
 async (conn, mek, m, { isOwner, reply }) => {
-
     if (!isOwner) return;
+    
+    // Work Type Cycle Logic (public -> private -> inbox -> groups -> public)
+    let currentMode = config.WORK_TYPE || 'public';
+    let newMode = 'public';
+    
+    if (currentMode === 'public') newMode = 'private';
+    else if (currentMode === 'private') newMode = 'inbox';
+    else if (currentMode === 'inbox') newMode = 'groups';
+    else if (currentMode === 'groups') newMode = 'public';
 
-    const currentMode =
-        String(config.WORK_TYPE || 'public').toLowerCase();
-
-    let newMode;
-
-    if (currentMode === 'public') {
-        newMode = 'private';
-    } else if (currentMode === 'private') {
-        newMode = 'inbox';
-    } else if (currentMode === 'inbox') {
-        newMode = 'groups';
-    } else {
-        newMode = 'public';
-    }
-
-    await updateConfig(
-        'WORK_TYPE',
-        newMode,
-        reply
-    );
+    updateConfig('WORK_TYPE', newMode, reply);
 });
