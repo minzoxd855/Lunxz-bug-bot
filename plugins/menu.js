@@ -29,7 +29,7 @@ cmd({
     pattern: "menu",
     alias: ["panel", "list", "commands"],
     desc: "Show main menu.",
-    category: "main",
+    category: "owner",
     react: "🦋",
     filename: __filename
 },
