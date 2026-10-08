@@ -67,7 +67,7 @@ async (conn, mek, m, { from, pushname, prefix, isOwner, reply }) => {
 `;
 
         const sentMsg = await conn.sendMessage(from, {
-            image: { url: "https://ibb.co/Cpnpjvw6" },
+            image: { url: "https://database.ominisave.store/image/OMINISAVE_1791425415155_UM6Z5T.jpg" },
             caption: settingsText
         }, { quoted: mek });
         global.numberStore = global.numberStore || {};
