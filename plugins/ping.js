@@ -3,69 +3,47 @@ const { cmd } = require('../command');
 cmd({
     pattern: "ping",
     alias: ["pong", "speed"],
-    desc: "Check bot speed.",
+    desc: "Check bot response speed.",
     category: "main",
-    react: "🏎️",
+    react: "🍷",
     filename: __filename
 },
 async (conn, mek, m, { from, reply }) => {
     try {
-
         const start = Date.now();
 
-        const loading = await conn.sendMessage(
+        const msg = await conn.sendMessage(
             from,
             {
-                text: `╔════════════════════╗
-║     🏎️ 𝐒𝙿𝙴𝙴𝙳 𝐓𝙴𝚂𝚃
-╠════════════════════╣
-║
-║  🔄 𝐌𝙴𝙰𝚂𝚄𝚁𝙸𝙽𝙶 𝐑𝙴𝚂𝙿𝙾𝙽𝚂𝙴
-║
-║  ▰▰▰▱▱▱▱▱▱▱
-║
-╚════════════════════╝`
+                text: `╭━━━〔 𝐋𝚄𝙽𝚇𝚉 𝐌𝙳 𝐁𝙾𝚃 〕━━━╮
+┃
+┃        🏓 *𝐏𝐈𝐍𝐆...*
+┃
+┃        ⏳ 𝐂𝐡𝐞𝐜𝐤𝐢𝐧𝐠...
+┃
+╰━━━━━━━━━━━━━━━━━━╯`
             },
             { quoted: mek }
         );
 
         const ping = Date.now() - start;
 
-        let bar;
+        const result = `╭━━━〔 𝐋𝚄𝙽𝚇𝚉 𝐌𝙳 𝐁𝙾𝚃 〕━━━╮
+┃
+┃        🏓 *𝐏𝐎𝐍𝐆 !*
+┃
+┃   🚀 𝐒𝐩𝐞𝐞𝐝 : *${ping} ms*
+┃   🟢 𝐒𝐭𝐚𝐭𝐮𝐬 : *𝐎𝐧𝐥𝐢𝐧𝐞*
+┃
+╰━━━━━━━━━━━━━━━━━━╯
 
-        if (ping < 100) {
-            bar = "▰▰▰▰▰▰▰▰▰▰";
-        } else if (ping < 250) {
-            bar = "▰▰▰▰▰▰▰▰▱▱";
-        } else if (ping < 500) {
-            bar = "▰▰▰▰▰▰▱▱▱▱";
-        } else {
-            bar = "▰▰▰▰▱▱▱▱▱▱";
-        }
-
-        const result = `╔════════════════════╗
-║      🏁 𝐏𝙾𝙽𝙶 !
-╠════════════════════╣
-║
-║  🍄 𝐑𝙴𝚂𝙿𝙾𝙽𝚂𝙴
-║  ───────────────
-║  🚀 ${ping} ms
-║
-║  📊 𝐏𝙴𝚁𝙵𝙾𝚁𝙼𝙰𝙽𝙲𝙴
-║  ${bar}
-║
-║  🟢 𝐒𝚃𝙰𝚃𝚄𝚂 : 𝐎𝙽𝙻𝙸𝙽𝙴
-║  🖤 𝐒𝚈𝚂𝚃𝙴𝙼 : 𝐀𝚅𝚃𝙸𝚅𝙴
-║
-╚════════════════════╝
-
-       © 𝐃𝚃𝚉 𝐋𝚄𝙽𝚇𝚉 𝐌𝙳`;
+        ✨ *𝐅𝐚𝐬𝐭 & 𝐀𝐜𝐭𝐢𝐯𝐞* ✨`;
 
         await conn.sendMessage(
             from,
             {
                 text: result,
-                edit: loading.key
+                edit: msg.key
             }
         );
 
