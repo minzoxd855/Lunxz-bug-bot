@@ -2,10 +2,15 @@ const { cmd, commands } = require('../command');
 const os = require('os');
 const moment = require('moment-timezone');
 
-const botLogo = "https://i.ibb.co/S7P5vhDd/IMG-20260711-WA0033.jpg";
+const botLogo = "https://i.ibb.co/LdWgBW1t/4976157a9447.jpg";
 
 const logoTypes = ["neon","neon2","fire2","glitch","hacker","futuristic","thunder","devil","fire","ice","snow","lava","metal","gold","silver","glossy","blackpink","transformer","horror","blood","joker","galaxy","space","cloud","sand","stone","magma","gradient","light","paper","watercolor","candy","christmas","luxury","leaf","summer","circuit","block3d","cartoon","chrome","frozen"];
 
+const newsletterInfo = {
+    newsletterJid: "143366645887163@lid",
+    newsletterName: "Ｍᴀᴋᴏ ᴛᴇᴀᴄʜ ᴏꜰᴄ 💋",
+    serverMessageId: 1
+};
 
 cmd({
     pattern: "menu",
@@ -38,38 +43,40 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
         else if (time >= 12 && time < 17) greeting = "Good Afternoon";
         else if (time >= 17 && time < 20) greeting = "Good Evening";
 
-        const menuText = `╭─── « ɢᴀʏᴀɴ ᴍᴅ » ───⟡
+        const menuText = `╭─── « ʙʟᴀᴄᴋ Qᴜᴇᴇɴ ᴍᴅ » ───⟡
 │
-│ ⊳ *𝗛𝗶 ${pushname}, ${greeting}!*
+│ ⊳ *ʜɪ ${pushname}, ${greeting}!*
 │
-│ ◈ 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 : 1.0.0
-│ ◈ 𝗢𝘄𝗻𝗲𝗿  : Gayan
-│ ◈ 𝗥𝗮𝗺    : ${ramUsage}
-│ ◈ 𝗨𝗽𝘁𝗶𝗺𝗲 : ${rtime}
-│ ◈ 𝗛𝗼𝘀𝘁   : ${hostname}
-│
-╰───────────────⟡
-
-╭─── « 𝗖𝗢𝗠𝗠𝗔𝗡𝗗 𝗣𝗔𝗡𝗘𝗟 » ───⟡
-│
-│ [ 𝟭 ] 𝗠𝗔𝗜𝗡 𝗠𝗘𝗡𝗨
-│ [ 𝟮 ] 𝗢𝗪𝗡𝗘𝗥 𝗠𝗘𝗡𝗨
-│ [ 𝟯 ] 𝗚𝗥𝗢𝗨𝗣 𝗠𝗘𝗡𝗨
-│ [ 𝟰 ] 𝗟𝗢𝗚𝗢 𝗠𝗘𝗡𝗨
-│ [ 𝟱 ] 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗦
-│ [ 𝟲 ] 𝗦𝗘𝗔𝗥𝗖𝗛 𝗠𝗘𝗡𝗨
-│ [ 𝟳 ] 𝗔𝗜 𝗙𝗘𝗔𝗧𝗨𝗥𝗘𝗦
-│ [ 𝟴 ] 𝗢𝗧𝗛𝗘𝗥 𝗧𝗢𝗢𝗟𝗦
+│ ◈ ᴠᴇʀꜱɪᴏɴ : 3.0.0
+│ ◈ ᴏᴡɴᴇʀ  : ᴍᴀᴋᴏ xᴅ ヤ
+│ ◈ ʀᴀᴍ    : ${ramUsage}
+│ ◈ ᴜᴘᴛɪᴍᴇ : ${rtime}
+│ ◈ ʜᴏꜱᴛ   : ${hostname}
 │
 ╰───────────────⟡
 
-> _Reply with a number to navigate._`;
+*╭━━━〔  Ｃᴏᴍᴍᴀɴᴅ Ｐᴀɴᴇʟ 🌈 〕━━━╮*
+│
+*│ ➊ 🏠 :  ᴍᴀɪɴ ᴍᴇɴᴜ )*
+*│ ➋ 👑 : ᴏᴡɴᴇʀ ᴍᴇɴᴜ )* 
+*│ ➌ 👥 :  ɢʀᴏᴜᴘ ᴍᴇɴᴜ )*
+*│ ➍ 🎨 : ʟᴏɢᴏ ᴍᴇɴᴜ )*
+*│ ➎ 📥 :  ᴅᴏᴡɴʟᴏᴀᴅs )*
+*│ ➏ 🧃: sᴇᴀʀᴄʜ ᴍᴇɴᴜ )*
+*│ ➐ 🍬 : ᴀɪ ғᴇᴀᴛᴜʀᴇs )*
+*│ ➑ 🌈 : ᴏᴛʜᴇʀ ᴛᴏᴏʟs )*
+│
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+< ʀᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ 🌈" >`;
 
         const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
 
         const sentMsg = await conn.sendMessage(from, {
             image: imgBuffer,
-            caption: menuText
+            caption: menuText,
+            contextInfo: {
+                forwardedNewsletterMessageInfo: newsletterInfo
+            }
         }, { quoted: mek });
 
         const msgId = sentMsg.key.id;
@@ -103,16 +110,22 @@ const generateSubMenu = async (conn, mek, from, category, title, pushname, reply
 
         if (cmdList === '') cmdList = `│ ⊳ No commands found.\n│\n`;
 
-        let menuContent = `╭─── « 𝐆ᴀʏᴀɴ 𝐦ᴅ» ───⟡
+        let menuContent = `╭─── « 𝐁𝐋𝐀𝐂𝐊 𝐐𝐔𝐄𝐄𝐍 𝐌𝐃 » ───⟡
 │
 │ ⊳ *${title}*
 │
 ${cmdList}╰───────────────⟡
 
-> © 𝐆ᴀʏᴀɴ 𝐌ᴅ`;
+> ©𝙱𝙻𝙰𝙲𝙺 𝚀𝚄𝙴𝙴𝙽 𝙼𝙳`;
 
         const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
-        await conn.sendMessage(from, { image: imgBuffer, caption: menuContent }, { quoted: mek });
+        await conn.sendMessage(from, { 
+            image: imgBuffer, 
+            caption: menuContent,
+            contextInfo: {
+                forwardedNewsletterMessageInfo: newsletterInfo
+            }
+        }, { quoted: mek });
     } catch (e) { 
         reply('*❌ Submenu Error !!*'); 
         console.log(e); 
@@ -122,9 +135,9 @@ ${cmdList}╰───────────────⟡
 cmd({ pattern: "logomenu", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     try {
-        let logoList = `╭─── « 𝐆ᴀʏᴀɴ 𝐌ᴅ» ───⟡
+        let logoList = `╭─── « 𝐁𝐋𝐀𝐂𝐊 𝐐𝐔𝐄𝐄𝐍 𝐌𝐃 » ───⟡
 │
-│ ⊳ *𝗟𝗢𝗚𝗢 𝗠𝗔𝗞𝗘𝗥 𝗠𝗘𝗡𝗨*
+│ ⊳ *𝐋𝐎𝐆𝐎 𝐌𝐀𝐊𝐄𝐑 𝐌𝐄𝐍𝐔*
 │
 `;
         
@@ -140,17 +153,23 @@ async(conn, mek, m, {from, pushname, reply}) => {
 > _Reply with a number to generate._
 > _To set custom name: .logo <name>_
 
-> © 𝐆ᴀʏᴀɴ 𝐌ᴅ`;
+> © 𝙱𝙻𝙰𝙲𝙺 𝚀𝚄𝙴𝙴𝙽 𝙼𝙳`;
 
         const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
-        const sentMsg = await conn.sendMessage(from, { image: imgBuffer, caption: logoList }, { quoted: mek });
+        const sentMsg = await conn.sendMessage(from, { 
+            image: imgBuffer, 
+            caption: logoList,
+            contextInfo: {
+                forwardedNewsletterMessageInfo: newsletterInfo
+            }
+        }, { quoted: mek });
 
         const msgId = sentMsg.key.id;
         global.numberStore = global.numberStore || {};
         global.numberStore[msgId] = {};
 
         logoTypes.forEach((type, index) => {
-            global.numberStore[msgId][(index + 1).toString()] = `genlogo ${type}&${pushname}`;
+            global.numberStore[msgId][(index + 1).toString()] = `genlogo \( {type}& \){pushname}`;
         });
 
     } catch (e) {
