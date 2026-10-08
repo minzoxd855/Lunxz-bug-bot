@@ -2,10 +2,10 @@ const { cmd } = require('../command');
 
 cmd({
     pattern: "ping",
-    alias: ["speed", "pong"],
-    desc: "Check bot response speed.",
+    alias: ["pong", "speed"],
+    desc: "Check bot speed.",
     category: "main",
-    react: "🏓",
+    react: "🏎️",
     filename: __filename
 },
 async (conn, mek, m, { from, reply }) => {
@@ -13,65 +13,64 @@ async (conn, mek, m, { from, reply }) => {
 
         const start = Date.now();
 
-        // Initial message
-        const msg = await conn.sendMessage(
+        const loading = await conn.sendMessage(
             from,
             {
-                text: `╭━━━〔 𝐋𝚄𝙽𝚇𝚉 𝐌𝙳 〕━━━╮
-┃
-┃   ⚡ 𝑷𝑰𝑵𝑮 𝑻𝑬𝑺𝑻
-┃
-┃   ⏳ 𝑪𝒉𝒆𝒄𝒌𝒊𝒏𝒈 𝒔𝒑𝒆𝒆𝒅...
-┃
-╰━━━━━━━━━━━━━━━━━━╯`
+                text: `╔════════════════════╗
+║     🏎️ 𝐒𝙿𝙴𝙴𝙳 𝐓𝙴𝚂𝚃
+╠════════════════════╣
+║
+║  🔄 𝐌𝙴𝙰𝚂𝚄𝚁𝙸𝙽𝙶 𝐑𝙴𝚂𝙿𝙾𝙽𝚂𝙴
+║
+║  ▰▰▰▱▱▱▱▱▱▱
+║
+╚════════════════════╝`
             },
             { quoted: mek }
         );
 
-        // Calculate response time
         const ping = Date.now() - start;
 
-        let status;
-        let emoji;
+        let bar;
 
         if (ping < 100) {
-            status = "𝑬𝒙𝒄𝒆𝒍𝒍𝒆𝒏𝒕";
-            emoji = "🟢";
-        } else if (ping < 300) {
-            status = "𝑭𝒂𝒔𝒕";
-            emoji = "🟢";
-        } else if (ping < 600) {
-            status = "𝑮𝒐𝒐𝒅";
-            emoji = "🟡";
+            bar = "▰▰▰▰▰▰▰▰▰▰";
+        } else if (ping < 250) {
+            bar = "▰▰▰▰▰▰▰▰▱▱";
+        } else if (ping < 500) {
+            bar = "▰▰▰▰▰▰▱▱▱▱";
         } else {
-            status = "𝑺𝒍𝒐𝒘";
-            emoji = "🔴";
+            bar = "▰▰▰▰▱▱▱▱▱▱";
         }
 
-        const result = `╭━━━〔 𝐋𝚄𝙽𝚇𝚉 𝐌𝙳 〕━━━╮
-┃
-┃   ⚡ 𝑷𝑶𝑵𝑮 !
-┃
-┃   🚀 𝑺𝒑𝒆𝒆𝒅   : ${ping} ms
-┃   ${emoji} 𝑺𝒕𝒂𝒕𝒖𝒔  : ${status}
-┃   🤖 𝑩𝒐𝒕     : 𝑶𝒏𝒍𝒊𝒏𝒆
-┃
-╰━━━━━━━━━━━━━━━━━━╯
+        const result = `╔════════════════════╗
+║      🏁 𝐏𝙾𝙽𝙶 !
+╠════════════════════╣
+║
+║  🍄 𝐑𝙴𝚂𝙿𝙾𝙽𝚂𝙴
+║  ───────────────
+║  🚀 ${ping} ms
+║
+║  📊 𝐏𝙴𝚁𝙵𝙾𝚁𝙼𝙰𝙽𝙲𝙴
+║  ${bar}
+║
+║  🟢 𝐒𝚃𝙰𝚃𝚄𝚂 : 𝐎𝙽𝙻𝙸𝙽𝙴
+║  🖤 𝐒𝚈𝚂𝚃𝙴𝙼 : 𝐀𝚅𝚃𝙸𝚅𝙴
+║
+╚════════════════════╝
 
-> 𝐋𝚄𝙽𝚇𝚉 𝐌𝙳 🖤
-> ⚡ 𝑭𝒂𝒔𝒕 • 𝑺𝒎𝒐𝒐𝒕𝒉 • 𝑨𝒄𝒕𝒊𝒗𝒆`;
+       © 𝐃𝚃𝚉 𝐋𝚄𝙽𝚇𝚉 𝐌𝙳`;
 
-        // Edit previous message
         await conn.sendMessage(
             from,
             {
                 text: result,
-                edit: msg.key
+                edit: loading.key
             }
         );
 
     } catch (e) {
         console.error(e);
-        reply(`❌ Ping Error!\n\n${e.message || e}`);
+        reply(`❌ Error: ${e.message || e}`);
     }
 });
