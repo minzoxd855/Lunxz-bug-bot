@@ -1,13 +1,30 @@
 const { cmd } = require('../command')
-const axios = require('axios')
+const ytdlp = require('youtube-dl-exec')
+const fs = require('fs')
+const path = require('path')
+const os = require('os')
 
-const API = 'https://supunofc.site/api/download/yt-down'
-const APIKEY = process.env.YT_APIKEY || 'ඔයාගේ_apikey_එක'
+const MAX_SEC = 20 * 60 // විනාඩි 20 ට වැඩි නම් නවත්තනවා
 
-async function getData(url) {
-  const { data } = await axios.get(API, { params: { url, apikey: APIKEY } })
-  if (!data.success) throw new Error('API error')
-  return data
+function cleanUrl(u) {
+  const m = u.match(/(?:shorts\/|youtu\.be\/|v=)([\w-]{11})/)
+  return m ? `https://www.youtube.com/watch?v=${m[1]}` : u
+}
+
+const baseOpts = {
+  noPlaylist: true,
+  noWarnings: true
+  // cookies: './cookies.txt',  // YouTube "bot" block එකක් ආවොත් මේක on කරන්න
+}
+
+async function getInfo(url) {
+  return ytdlp(url, { ...baseOpts, dumpSingleJson: true })
+}
+
+async function download(url, name, format) {
+  const out = path.join(os.tmpdir(), name)
+  await ytdlp(url, { ...baseOpts, format, output: out })
+  return out
 }
 
 // ---------- VIDEO ----------
@@ -18,32 +35,27 @@ cmd({
   category: 'download',
   filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {
+  let file
   try {
     if (!q || !/youtu/.test(q)) return reply('❌ YouTube link එකක් දෙන්න.\nඋදා: .ytmp4 https://youtu.be/xxxx')
-
+    const url = cleanUrl(q)
     await reply('⏳ Download වෙනවා...')
-    const data = await getData(q)
-    const res = data.result
 
-    // 360p -> 720p -> 480p අනුපිළිවෙලින් mp4 තෝරනවා
-    const prefer = ['360p', '720p', '480p']
-    let video
-    for (const p of prefer) {
-      video = res.videoStreams.find(v => v.resolution === p && v.extension === 'mp4')
-      if (video) break
-    }
-    if (!video) return reply('❌ සුදුසු video format එකක් නැහැ.')
+    const info = await getInfo(url)
+    if (info.duration > MAX_SEC) return reply('❌ Video එක විනාඩි 20 ට වඩා දිගයි.')
 
-    const title = data.data.description?.split('\n')[0] || 'YouTube Video'
+    file = await download(url, `${info.id}.mp4`, '18/best[ext=mp4][height<=480]/best[height<=480]')
 
     await conn.sendMessage(from, {
-      video: { url: video.downloadUrl },
+      video: fs.readFileSync(file),
       mimetype: 'video/mp4',
-      caption: `🎬 *${title}*\n📺 ${video.resolution}`
+      caption: `🎬 *${info.title}*\n👤 ${info.uploader}`
     }, { quoted: mek })
   } catch (e) {
     console.log(e)
-    reply('❌ Error: ' + e.message)
+    reply('❌ Error: ' + (e.stderr || e.message).toString().slice(0, 300))
+  } finally {
+    if (file && fs.existsSync(file)) fs.unlinkSync(file)
   }
 })
 
@@ -55,20 +67,25 @@ cmd({
   category: 'download',
   filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {
+  let file
   try {
     if (!q || !/youtu/.test(q)) return reply('❌ YouTube link එකක් දෙන්න.\nඋදා: .ytmp3 https://youtu.be/xxxx')
-
+    const url = cleanUrl(q)
     await reply('⏳ Download වෙනවා...')
-    const data = await getData(q)
-    const audio = data.result.audioStreams.find(a => a.extension === 'm4a') || data.result.audioStreams[0]
-    if (!audio) return reply('❌ Audio එකක් හොයාගන්න බැරි උනා.')
+
+    const info = await getInfo(url)
+    if (info.duration > MAX_SEC) return reply('❌ Video එක විනාඩි 20 ට වඩා දිගයි.')
+
+    file = await download(url, `${info.id}.m4a`, 'bestaudio[ext=m4a]/bestaudio')
 
     await conn.sendMessage(from, {
-      audio: { url: audio.downloadUrl },
-      mimetype: 'audio/mpeg'
+      audio: fs.readFileSync(file),
+      mimetype: 'audio/mp4'
     }, { quoted: mek })
   } catch (e) {
     console.log(e)
-    reply('❌ Error: ' + e.message)
+    reply('❌ Error: ' + (e.stderr || e.message).toString().slice(0, 300))
+  } finally {
+    if (file && fs.existsSync(file)) fs.unlinkSync(file)
   }
 })
